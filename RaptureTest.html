@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rapture Test: Following Jesus</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121831; --card:#0e1328; --ink:#eaf2ff;
+    --muted:#96a3c7; --accent:#61dafb; --good:#35d49a; --bad:#ff6b6b;
+    --btn:#0f1530; --btn-br:rgba(255,255,255,.15);
+  }
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;margin:0;padding:40px}
+  h1{color:var(--accent);text-align:center;margin:0 0 10px}
+  .wrap{max-width:900px;margin:auto;background:var(--panel);padding:24px;border-radius:16px;box-shadow:0 0 25px rgba(0,0,0,.35)}
+  .lead{text-align:center;margin:0 0 20px;color:var(--muted)}
+  .card{background:var(--card);padding:18px;margin:18px 0;border-radius:14px}
+  .ref{font-size:.9rem;color:var(--muted);margin:0 0 10px}
+  .choices{display:grid;gap:8px}
+  .choice{
+    display:block;width:100%;text-align:left;padding:11px 14px;border-radius:12px;
+    background:var(--btn);color:var(--ink);border:1px solid var(--btn-br);
+    cursor:pointer;font-weight:600;transition:all .15s ease;
+  }
+  .choice:hover{border-color:var(--accent);background:#182043}
+  .choice.selected{outline:2px solid var(--accent)}
+  .msg{margin-top:8px;font-size:.95rem;line-height:1.4;min-height:1.2em}
+  .msg.good{color:var(--good)}
+  .msg.bad{color:var(--bad)}
+  .finish{display:none}
+  .restart{
+    display:block;width:100%;text-align:center;background:var(--accent);color:var(--panel);
+    border:none;border-radius:12px;padding:12px 0;margin-top:14px;font-weight:800;cursor:pointer;
+  }
+  .restart:hover{filter:brightness(1.05)}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Rapture Test: Following Jesus</h1>
+    <p class="lead">Click the answer you believe is correct. You can change your answer anytime.</p>
+
+    <div id="quiz"></div>
+
+    <!-- Finish card (revealed only after all are correct) -->
+    <div id="finish" class="card finish">
+      <h2>Well done good and faithful servant!</h2>
+      <p>When we follow Jesus we can see where He is right now and when He arises. Friends, all appointed (feast days) times must be fulfilled in their seasons. If you notice in Psalms 132, we will go into His tabernacles — that feast will be completed. And we will worship at His footstool, because now there is a footstool that is also completed. The very next verse says, “Arise, O Lord, into Thy rest.” The rest is the millennial reign, and “let Thy priests be clothed with righteousness,” this is our glorified bodies, and “let the saints shout for joy,” because we rule with Him in His kingdom.</p>
+      <p>When we watch, the opposite of Revelation 3:3 will be true, because this is what happens if you don't watch.</p>
+      <p>For more info visit <a href="https://asathief.com" target="_blank" rel="noopener">ASATHIEF.COM</a></p>
+      <button class="restart" id="restartBtn">🔁 Restart Quiz</button>
+    </div>
+  </div>
+
+<script>
+/* ---------- Data ---------- */
+const DATA = [
+  {
+    q: "Where is Jesus right now?",
+    ref: "Psalm 110:1; Acts 2:33–35; Hebrews 10:12–13",
+    choices: [
+      ["In the wilderness", false, ""],
+      ["On the Mount of Olives", false, ""],
+      ["At the right hand of God", true, "He is seated at the right hand of God (Ps 110:1; Acts 2:33–35; Heb 10:12–13)."],
+      ["Traveling between heaven and earth", false, ""]
+    ]
+  },
+  {
+    q: "How long must He remain there?",
+    ref: "Psalm 110:1; Hebrews 10:12–13",
+    choices: [
+      ["Until the rapture happens", false, ""],
+      ["Until all prophecy is unsealed", false, ""],
+      ["Until His enemies are made His footstool", true, "He remains there until His enemies are made His footstool (Ps 110:1; Heb 10:13)."],
+      ["Until the 6th trumpet", false, ""]
+    ]
+  },
+  {
+    q: "Where is He when the day of wrath is described?",
+    ref: "Psalm 110:5",
+    choices: [
+      ["Standing on Mount Zion", false, ""],
+      ["At the right hand (“The Lord at Your right hand”)", true, "Psalm 110:5 — ‘The Lord at Your right hand shall shatter kings in the day of His wrath.’"],
+      ["Riding in the clouds", false, ""],
+      ["In the earthly temple", false, ""]
+    ]
+  },
+  {
+    q: "Does the rapture happen before the enemies are made a footstool?",
+    ref: "Psalm 110:1; Hebrews 10:12–13",
+    choices: [
+      ["Yes", false, ""],
+      ["No", true, "He remains at the right hand ‘until’ His enemies are made His footstool — the rapture does not precede that condition."]
+    ]
+  },
+  {
+    q: "When does He arise?",
+    ref: "Psalm 132:7–9; 132:13–14; Psalm 110:1",
+    choices: [
+      ["When the enemies are made a footstool — ‘Arise, O LORD, into Your rest.’", true, "Psalm 132 links God’s arising with entering His resting place, paired with Psalm 110’s footstool."],
+      ["Immediately after His ascension", false, ""],
+      ["Feast of Trumpets", false, ""],
+      ["Only after the Millennium", false, ""]
+    ]
+  },
+  {
+    q: "Is it important to watch?",
+    ref: "Revelation 3:3; Matthew 24:42–44",
+    choices: [
+      ["Yes", true, "Revelation 3:3 and Matthew 24:42 both command believers to watch and be ready."],
+      ["No", false, ""]
+    ]
+  },
+  {
+    q: "What feast day does He come back?",
+    ref: "Zechariah 14:16–19; John 7:37–39; Revelation 21:3",
+    choices: [
+      ["Passover", false, ""],
+      ["Pentecost", false, ""],
+      ["Feast of Tabernacles", true, "Zechariah 14:16–19 shows all nations will go up to worship the King during the Feast of Tabernacles."],
+      ["Firstfruits", false, ""]
+    ]
+  }
+];
+
+/* ---------- Render ---------- */
+const quizEl = document.getElementById("quiz");
+let correctMap = []; // tracks which questions are correct (true/false)
+
+function renderQuiz(){
+  quizEl.innerHTML = "";
+  correctMap = Array(DATA.length).fill(false);
+  document.getElementById("finish").style.display = "none";
+
+  DATA.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const title = document.createElement("h2");
+    title.textContent = `${idx+1}. ${q.q}`;
+    const ref = document.createElement("div");
+    ref.className = "ref";
+    ref.textContent = q.ref;
+
+    const choices = document.createElement("div");
+    choices.className = "choices";
+
+    q.choices.forEach(([text, isCorrect, explain]) => {
+      const btn = document.createElement("button");
+      btn.className = "choice";
+      btn.textContent = text;
+      btn.addEventListener("click", () => {
+        // allow changing the answer: never disable buttons
+        // update selected visual
+        [...choices.children].forEach(c => c.classList.remove("selected"));
+        btn.classList.add("selected");
+
+        // message output
+        msg.classList.remove("good","bad");
+        if (isCorrect) {
+          msg.classList.add("good");
+          msg.innerHTML = `✅ <b>Correct!</b> ${explain || ""}`;
+          correctMap[idx] = true;
+        } else {
+          msg.classList.add("bad");
+          msg.innerHTML = "❌ <b>Try again.</b>";
+          correctMap[idx] = false;
+        }
+        checkAllCorrect();
+      });
+      choices.appendChild(btn);
+    });
+
+    const msg = document.createElement("div");
+    msg.className = "msg";
+
+    card.append(title, ref, choices, msg);
+    quizEl.appendChild(card);
+  });
+}
+
+function checkAllCorrect(){
+  const allGood = correctMap.every(Boolean);
+  if (allGood){
+    const finish = document.getElementById("finish");
+    if (finish.style.display !== "block"){
+      finish.style.display = "block";
+      // smooth scroll into view
+      finish.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+  } else {
+    document.getElementById("finish").style.display = "none";
+  }
+}
+
+/* ---------- Restart ---------- */
+document.getElementById("restartBtn").addEventListener("click", renderQuiz);
+
+/* init */
+renderQuiz();
+</script>
+</body>
+</html>
